@@ -1,15 +1,36 @@
-import { Component } from '@angular/core';
+import { GifsService } from './../../services/gifs.service';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 
 @Component({
   selector: 'gifs-search-box',
   template: `
     <h5>Buscar:</h5>
-    <input type="text" class="form-control" placeholder="Buscar gifs...">
+    <input
+    type="text"
+    class="form-control"
+    placeholder="Buscar gifs..."
+    (keyup.enter)="searchTag()"
+    #txtTagInput
+    >
   `
 })
 
 export class SearchBoxComponent {
-  constructor() { }
+  //para usar el servicio lo injectamos en el constructor
+  constructor( private gifsService: GifsService) { }
 
+  //decorador usando child
+  @ViewChild('txtTagInput')
+  public tagInput!: ElementRef<HTMLInputElement>;
+
+  //metodo
+  searchTag(){
+    const newTag = this.tagInput.nativeElement.value;
+    //llegada de dato nuevo
+    this.gifsService.seachTag(newTag);
+    //limpiar
+    this.tagInput.nativeElement.value = '';
+
+  }
 
 }
