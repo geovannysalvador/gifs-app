@@ -12,7 +12,9 @@ export class GifsService {
   private apiKey:       string = 'hhYcbxDnbxewglZZQuPdfQftGAJUpe5Q';
   private serviceUrl:   string = 'http://api.giphy.com/v1/gifs';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) {
+    this.loadLocalStorage();
+  }
 
   get tagsHistory(){
     return [...this._tagsHistory];
@@ -20,41 +22,35 @@ export class GifsService {
 
   //metodo para organizar el historial en basea ya buscados
   private orgamizeHistory(tag:string){
-    //pasar todo a minuscula para mejorar la busqueda
+
     tag= tag.toLowerCase();
-    //condicion para ver si existe o no en el arrego para prganizarlo de nuevo
     if(this._tagsHistory.includes(tag)){
-      //se elimina
       this._tagsHistory =  this._tagsHistory.filter((oldTag) => oldTag !== tag)
     }
-    this._tagsHistory.unshift(tag);
 
-    //limitacion de mostrar el historial a 10
+
+    this._tagsHistory.unshift(tag);
     this._tagsHistory = this._tagsHistory.splice(0,9);
+    //mandar la info al localStorage
+    this.saveLocalStorage();
   }
 
-  //metodo nuevo
-  // public seachTag(tag:string):void{
-  //   //para que si manda vacio no haga nada
-  //   if (tag.length === 0 ) return
-  //   this.orgamizeHistory(tag);
 
-  //metodo nuevo usando peticiones a la api
-  // async seachTag(tag:string):Promise<void>{
-  //   //para que si manda vacio no haga nada
-  //   if (tag.length === 0 ) return
-  //   this.orgamizeHistory(tag);
 
-    //-------------primera forma
-    // fetch('http://api.giphy.com/v1/gifs/search?api_key=hhYcbxDnbxewglZZQuPdfQftGAJUpe5Q&q=valorant&limit=10')
-    // .then(answer => answer.json())
-    // .then(data => console.log(data)
+  //mandar la info al localStorage con string
+  private saveLocalStorage():void{
+    localStorage.setItem('history', JSON.stringify (this._tagsHistory))
+  }
 
-    //------------------------otra forma de hacerlo
-    // const answer = await fetch('http://api.giphy.com/v1/gifs/search?api_key=hhYcbxDnbxewglZZQuPdfQftGAJUpe5Q&q=valorant&limit=10')
-    // const data = await answer.json();
+  //cargar el localStorage
+  private loadLocalStorage():void{
+    if (!localStorage.getItem('history')) return;
+    this._tagsHistory = JSON.parse (localStorage.getItem('history')!);
 
-    // console.log(data)
+    if (this._tagsHistory.length ===0) return;
+    this.seachTag(this._tagsHistory[0]);
+  }
+
 
     // usando metodo propios de angular
     public seachTag(tag:string):void{
